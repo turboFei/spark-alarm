@@ -205,16 +205,18 @@ trait StreamingAlarmListener extends SparkListener with StreamingListener {
      """.stripMargin
   }
 }
+
 object StreamingAlarmListener {
   // The length limit for failureReason to sent
   val failureReasonLimit: Int = 200
+  val maxLengthFactor: Double = 1.5
 
   def getLimitFailureReason(failureReason: String): String = {
     val nextLineIndex = failureReason.indexOf("\n", failureReasonLimit)
     if (nextLineIndex == -1) {
-      failureReason
+      failureReason.substring(0, math.min(failureReason.length, (failureReasonLimit * maxLengthFactor).toInt))
     } else {
-      failureReason.substring(0, nextLineIndex)
+      failureReason.substring(0, math.min(nextLineIndex, (failureReasonLimit * maxLengthFactor).toInt))
     }
   }
 }
